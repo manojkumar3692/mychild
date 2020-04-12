@@ -8,6 +8,7 @@ const resolvers = require('./graphQL/resolvers');
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { verify } =  require("jsonwebtoken");
+const PORT = process.env.PORT || 3000;
 const startServer = async () => {
   const server = new ApolloServer({
     // These will be defined for both new or existing servers
@@ -41,9 +42,11 @@ const startServer = async () => {
 
   server.applyMiddleware({ app }); // app is from an existing express app
 
-  app.listen({ port: process.env.PORT || 3000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+  app.listen({ port: PORT }, () =>
+    // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+    console.log('asdsadas',PORT)
   );
+  
 };
 
 startServer();
