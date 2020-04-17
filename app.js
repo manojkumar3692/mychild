@@ -15,7 +15,6 @@ const startServer = async () => {
     context: ({ req, res }) => ({ req, res })
   });
 
-
  const app = Express();
 
   app.use(cookieParser());
@@ -37,8 +36,8 @@ const startServer = async () => {
 
     next();
   });
-
-  server.applyMiddleware({ app }); // app is from an existing express app
+  const path = '/graphql';  
+  server.applyMiddleware({ app,path }); // app is from an existing express app
 
   app.listen({ port: PORT }, () =>
     // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
