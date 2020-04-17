@@ -79,11 +79,12 @@ const resolvers = {
         //     })
         //     return response
         // },
-        createReward: async (parent,{name,amount,message},context,info) => {
+        createReward: async (parent,{name,amount,message,user_id},context,info) => {
             const response = await Rewards.create({
                 name,
                 amount,
                 message,
+                user_id
             })
             .then((reward) => {
                 console.log('after suc',reward)

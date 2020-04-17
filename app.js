@@ -9,6 +9,8 @@ const { verify } =  require("jsonwebtoken");
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {
   const server = new ApolloServer({
+    introspection: true,
+    playground: true,
     // These will be defined for both new or existing servers
     typeDefs,
     resolvers,
