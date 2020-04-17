@@ -24,19 +24,25 @@ module.exports = gql`
         updatedAt: String
     }
 
+    type Reward {
+        id: ID,
+        name:String,
+        amount:String,
+        message: String,
+        user_id: ID
+    }
+
     type Query {
-        stock(id: ID!): Stock,
-        stocks: [Stock],
-        deleteStock(id: ID!): Message,
+        # stock(id: ID!): Stock,
+        # stocks: [Stock],
+        # deleteStock(id: ID!): Message,
         me: User
     }
 
     type Mutation {
         register(name:String!,password:String!,email:String!): Message,
         login(email: String!,password:String!): User,
-        createStock(id: ID! ,
-        name: String!,
-        price: String!,
-        sku: String!): [Stock]
+        # createStock(id: ID!,name: String!, price: String!,sku: String!): [Stock],
+        createReward(name: String!,amount: String!,message: String!,user_id: ID): Reward
     }
 `

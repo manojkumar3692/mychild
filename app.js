@@ -1,7 +1,5 @@
 const Express  = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
-const schema = require('./schema')
-const app = Express();  
 const session = require('express-session')
 const typeDefs = require('./graphQL/typeDef');
 const resolvers = require('./graphQL/resolvers');
@@ -18,7 +16,7 @@ const startServer = async () => {
   });
 
 
-  const app = Express();
+ const app = Express();
 
   app.use(cookieParser());
 

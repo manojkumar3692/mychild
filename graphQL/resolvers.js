@@ -1,22 +1,24 @@
-const model = require('../model/index');
+
+const Users = require('../models').users;
+const Rewards = require('../models').rewards;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
 const resolvers = {
     Query: {
-        stock: (parent,args,context,info) => {
-           return model.stocks.findByPk(args.id)
-        },
-        stocks: () => model.stocks.findAll(),
-        deleteStock: async (parent,args,context,info) => {
-            const response = await model.stocks.findByPk(args.id)
-            .then((stock) => {
-                stock.destroy()
-                return 'Deleted Successfully'
-            })
-            return response
-        },
+        // stock: (parent,args,context,info) => {
+        //    return model.stocks.findByPk(args.id)
+        // },
+        // stocks: () => model.stocks.findAll(),
+        // deleteStock: async (parent,args,context,info) => {
+        //     const response = await model.stocks.findByPk(args.id)
+        //     .then((stock) => {
+        //         stock.destroy()
+        //         return 'Deleted Successfully'
+        //     })
+        //     return response
+        // },
         me:  (_,args,{req,res}) => {
             if(!req.userId) {
                 return null
@@ -36,7 +38,7 @@ const resolvers = {
                 return hash
             })
             console.log('hash',hashPassword)
-            const create = await model.users.create({
+            const create = await Users.create({
                 name,
                 email,
                 password: hashPassword
@@ -52,7 +54,7 @@ const resolvers = {
             const obj = {
                 message: 'Password is incorrect'
             }
-            const user = await model.users.findOne({where: {email}})
+            const user = await Users.findOne({where: {email}})
             .then((value) => {
                 return value
             })
@@ -70,12 +72,30 @@ const resolvers = {
             user.token = validToken
             return user 
         },
-        createStock: async (parent,args,context,info) => {
-            const response = await model.stocks.create(args)
-            .then((stocks) => {
-                return model.stocks.findAll()
+        // createStock: async (parent,args,context,info) => {
+        //     const response = await model.stocks.create(args)
+        //     .then((stocks) => {
+        //         return model.stocks.findAll()
+        //     })
+        //     return response
+        // },
+        createReward: async (parent,{name,amount,message},context,info) => {
+            const response = await Rewards.create({
+                name,
+                amount,
+                message,
             })
-            return response
+            .then((reward) => {
+                console.log('after suc',reward)
+                let obj = new Rewards({
+                    id: reward.id,
+                    name: reward.name,
+                    amount: reward.amount,
+                    message: reward.message,
+                    user_id: reward.user_id
+                })
+                return obj
+            })
         }
     }   
 }
