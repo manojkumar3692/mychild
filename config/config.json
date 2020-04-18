@@ -5,7 +5,10 @@
     "database": "minieli",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "operatorsAliases": false
+    "operatorsAliases": false,
+    "define": {
+      "timestamps": true
+    }
   },
   "test": {
     "username": "root",

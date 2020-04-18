@@ -17,6 +17,12 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
+      family_relation_id: {
+        type: Sequelize.INTEGER
+      },
+      mobile_number: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

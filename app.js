@@ -6,6 +6,7 @@ const resolvers = require('./graphQL/resolvers');
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { verify } =  require("jsonwebtoken");
+const { graphqlUploadExpress } = require('graphql-upload')
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {
   const server = new ApolloServer({
@@ -18,6 +19,8 @@ const startServer = async () => {
   });
 
  const app = Express();
+
+  // app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }))
 
   app.use(cookieParser());
 
@@ -39,7 +42,7 @@ const startServer = async () => {
     next();
   });
   const path = '/graphql';  
-  server.applyMiddleware({ app,path }); // app is from an existing express app
+  server.applyMiddleware({ app,path, }); // app is from an existing express app
 
   app.listen({ port: PORT }, () =>
     // console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
