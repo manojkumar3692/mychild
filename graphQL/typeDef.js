@@ -42,7 +42,7 @@ module.exports = gql`
 
     type Query {
         # stock(id: ID!): Stock,
-        # stocks: [Stock],
+        # stocks: [User],
         # deleteStock(id: ID!): Message,
         me: User
     }
@@ -50,9 +50,9 @@ module.exports = gql`
     type Mutation {
         register(name:String!,password:String!,email:String!,mobile_number:String!,family_relation_id:ID!): Message,
         login(email: String!,password:String!): User,
-        # createStock(id: ID!,name: String!, price: String!,sku: String!): [Stock],
-        createReward(name: String!,amount: String!,message: String!,user_id: ID): Reward,
-        singleUpload(file:Upload!): File
+        createStock(id: ID!,name: String!, price: String!,sku: String!): [Stock],
+        createReward(amount: String!,message: String!,user_id: ID): Reward,
+        singleUpload(file:Upload!): File,
     }
 `
 

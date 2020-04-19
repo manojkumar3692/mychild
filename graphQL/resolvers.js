@@ -9,8 +9,8 @@ const jwt = require('jsonwebtoken');
 const { GraphQLUpload } = require('graphql-upload')
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIAIHY26LSFBN3UHFNA',
-  secretAccessKey: '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'
+  accessKeyId: 'AKIAI7BMQW7SQRCNW7ZQ',
+  secretAccessKey: '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'
 });
 
 const resolvers = {
@@ -18,7 +18,7 @@ const resolvers = {
         // stock: (parent,args,context,info) => {
         //    return model.stocks.findByPk(args.id)
         // },
-        // stocks: () => model.stocks.findAll(),
+        // stocks: () => Users.stocks.findAll(),
         // deleteStock: async (parent,args,context,info) => {
         //     const response = await model.stocks.findByPk(args.id)
         //     .then((stock) => {
@@ -27,15 +27,20 @@ const resolvers = {
         //     })
         //     return response
         // },
-        me:  (_,args,{req,res}) => {
+        me:  async (parent,args,{req,res}) => {
             if(!req.userId) {
+                console.log('Inside me',req.userID)
                 return null
             } 
-            console.log('Inside Me',req.userID)
-            const response = model.users.findByPk(req.userId)
-            return response
+            const response = await Users.findOne({
+                include: [Rewards],
+                // attributes: {include: [Rewards]},
+                where: {id:5},
+            })
+            console.log('Inside Me',response.dataValues)
+            return {response}
         }
-        
+
     },
     Mutation: {
         register: async (_,{name,password,email,family_relation_id,mobile_number}) => {
@@ -77,9 +82,10 @@ const resolvers = {
             if(!valid) {
                 return obj
             }
-            const validToken = jwt.sign({ userId: user.id }, 'privateKey',{ expiresIn: '60s' }, { algorithm: 'RS256' })
+            const validToken = jwt.sign({ userId: user.id }, 'privateKey',{ expiresIn: '300s' }, { algorithm: 'RS256' })
             res.cookie('valid-token',validToken)
             user.token = validToken
+            console.log(res)
             return user 
         },
         // createStock: async (parent,args,context,info) => {
@@ -90,14 +96,13 @@ const resolvers = {
         //     return response
         // },
         createReward: async (parent,{name,amount,message,user_id},context,info) => {
-            const response = await Rewards.create({
+            await Rewards.create({
                 name,
                 amount,
                 message,
                 user_id
             })
             .then((reward) => {
-                console.log('after suc',reward)
                 return {name,amount,message,user_id}
             })
         },
@@ -112,8 +117,11 @@ const resolvers = {
             const result = await s3.upload(uploadParams).promise().catch((error) => {
                console.log(error)
             })
+
       
             console.log('results',result)
+            console.log(typeof result)
+            
 
             return {filename}
             
@@ -124,7 +132,7 @@ const resolvers = {
         //       .on("error", () => reject(false))
         //   );
           
-        }
+        },
     }   
 }
 module.exports = resolvers
