@@ -108,7 +108,7 @@ const resolvers = {
 
             //Here stream it to S3
             // Enter your bucket name here next to "Bucket: "
-            const uploadParams = {Bucket: 'mini-eli-buckets', Key: filename, Body: fileStream, ContentDisposition: 'inline', ContentType: mimetype };
+            const uploadParams = {Bucket: 'mini-eli-bucket', Key: filename, Body: fileStream, ContentDisposition: 'inline', ContentType: mimetype };
             const result = await s3.upload(uploadParams).promise().catch((error) => {
                console.log(error)
             })
