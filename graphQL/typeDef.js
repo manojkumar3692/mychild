@@ -12,7 +12,8 @@ module.exports = gql`
         email: String,
         password:String,
         family_relation_id:ID,
-        mobile_number:String
+        mobile_number:String,
+        token: String,
         createdAt: String,
         updatedAt: String
     }
@@ -31,7 +32,10 @@ module.exports = gql`
         name:String,
         amount:String,
         message: String,
-        user_id: ID
+        user_id: ID,
+        reward_id: ID,
+        createdAt: String,
+        updatedAt: String
     }
 
     type File {
@@ -51,7 +55,7 @@ module.exports = gql`
         register(name:String!,password:String!,email:String!,mobile_number:String!,family_relation_id:ID!): Message,
         login(email: String!,password:String!): User,
         createStock(id: ID!,name: String!, price: String!,sku: String!): [Stock],
-        createReward(amount: String!,message: String!,user_id: ID): Reward,
+        createReward(amount: String!,message: String!,user_id: ID,reward_id:ID!): Reward,
         singleUpload(file:Upload!): File,
     }
 `

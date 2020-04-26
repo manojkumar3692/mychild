@@ -1,8 +1,10 @@
 
 const createWriteStream  = require('fs').createWriteStream 
+const { ApolloServer, gql,ApolloError,AuthenticationError } = require('apollo-server-express');
 const fs = require('fs')
 const Users = require('../models').users;
 const Rewards = require('../models').rewards;
+const Family = require('../models').family_relations
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
@@ -50,20 +52,43 @@ const resolvers = {
             let hashPassword = await bcrypt.hash(password, saltRounds).then(function(hash) {
                 return hash
             })
-            console.log('hash',hashPassword)
+            // fs.readFile('demo.jpg', function (err, data) {
+            //     if (err) { throw err; }
+              
+              
+              
+            //        params = {Bucket: myBucket, Key: myKey, Body: data };
+              
+            //        s3.putObject(params, function(err, data) {
+              
+            //            if (err) {
+              
+            //                console.log(err)
+              
+            //            } else {
+              
+            //                console.log("Successfully uploaded data to myBucket/myKey");
+              
+            //            }
+              
+            //         });
+              
+            //   });
+
             const create = await Users.create({
                 name,
                 email,
                 password: hashPassword,
                 family_relation_id,
                 mobile_number
-            }).then(() => {
-                return obj
+            }).then( async (results) => {
+                return { message:'User created Successfully'}
             })
             .catch((error) => {
-                return error
+                console.log(error)
+                throw new ApolloError('Failed to register please try again', '400',error);
             })
-            return create
+            return { message:'User created Successfully'}
         },
         login: async (parent,{email,password},{req,res},info) => {
             const obj = {
@@ -74,7 +99,7 @@ const resolvers = {
                 return value
             })
             if(!user) {
-                return null
+              throw new ApolloError('No user found !, please try again', '400');
             }
             const valid = await bcrypt.compare(password, user.password).then(function(result) {
                 return result
@@ -83,9 +108,8 @@ const resolvers = {
                 return obj
             }
             const validToken = jwt.sign({ userId: user.id }, 'privateKey',{ expiresIn: '300s' }, { algorithm: 'RS256' })
-            res.cookie('valid-token',validToken)
+            res.userId = validToken
             user.token = validToken
-            console.log(res)
             return user 
         },
         // createStock: async (parent,args,context,info) => {
@@ -95,18 +119,26 @@ const resolvers = {
         //     })
         //     return response
         // },
-        createReward: async (parent,{name,amount,message,user_id},context,info) => {
-            await Rewards.create({
+        createReward: async (parent,{name,amount,message,user_id,reward_id},{req,res},info) => {
+            console.log('out',req)
+            if(!req.userId) {
+                console.log('Innnn')
+                throw new AuthenticationError('auth_error','503',)
+            }
+            const reward = await Rewards.create({
                 name,
                 amount,
                 message,
-                user_id
+                user_id,
+                reward_id
             })
             .then((reward) => {
-                return {name,amount,message,user_id}
+                return reward
             })
+            return reward
         },
         singleUpload: async(parent,{ file },context,info) => {
+            console.log('File Via Playground',file)
             const { filename, mimetype, createReadStream } = await file
             console.log(mimetype)
             const fileStream = createReadStream()
@@ -118,9 +150,7 @@ const resolvers = {
                console.log(error)
             })
 
-      
-            console.log('results',result)
-            console.log(typeof result)
+
             
 
             return {filename}

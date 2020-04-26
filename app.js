@@ -1,5 +1,5 @@
 const Express  = require('express');
-const { ApolloServer, gql } = require('apollo-server-express');
+const { ApolloServer, gql,ApolloError } = require('apollo-server-express');
 const session = require('express-session')
 const typeDefs = require('./graphQL/typeDef');
 const resolvers = require('./graphQL/resolvers');
@@ -7,7 +7,8 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const { verify } =  require("jsonwebtoken");
 const { graphqlUploadExpress } = require('graphql-upload')
-const PORT = process.env.PORT || 3000;
+const jwt = require('jsonwebtoken');
+const PORT = process.env.PORT || 3001;
 const startServer = async () => {
   const server = new ApolloServer({
     introspection: true,
@@ -15,7 +16,8 @@ const startServer = async () => {
     // These will be defined for both new or existing servers
     typeDefs,
     resolvers,
-    context: ({ req, res }) => ({ req, res })
+    context: ({ req, res }) => ({ req, res }),
+    ApolloError
   });
 
  const app = Express();
@@ -24,22 +26,31 @@ const startServer = async () => {
 
   app.use(cookieParser());
 
-  app.use((req, res, next) => {
-    const accessToken = req.cookies["valid-token"];
-
+  app.use( (req, res, next) => {
+    const tokenWithBearer = req.headers.authorization || ''
+    const token = tokenWithBearer.split(' ')[1]
+    console.log('First', token)
     // Skip direct if no access token is available
-    if(!accessToken) {
-      return next();
-    }
-
-
+    // if(!token) {
+    //   console.log('In',token)
+    //   return next();
+    // }
     try {
-      const data = verify(accessToken, 'privateKey')
-      req.userId = data.userId;
-      console.log('Inside Try',req.userId)
-    } catch(error) { }
-
-    next();
+      console.log('check token',token)
+        const data =  jwt.verify(token, 'privateKey')
+        req.userId = data.userId;
+        console.log('Inside try block')
+      // return null
+    } catch (err) {
+      // return null
+      console.log('Inside Catch block')
+    }
+    // try {
+    //   const data = verify(token, 'privateKey')
+    //   req.userId = data.userId;
+    // } catch(error) {
+    // }
+    next()
   });
   const path = '/graphql';  
   server.applyMiddleware({ app,path, }); // app is from an existing express app
